@@ -1,4 +1,4 @@
-defmodule Ssd1306.MixProject do
+defmodule SSD1306.MixProject do
   use Mix.Project
 
   def project do
@@ -7,7 +7,8 @@ defmodule Ssd1306.MixProject do
       version: "0.1.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
@@ -15,15 +16,24 @@ defmodule Ssd1306.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Ssd1306.Application, []}
+      mod: {SSD1306.Application, []}
+    ]
+  end
+
+  def package do
+    [
+      maintainers: ["James Harton <james@automat.nz>"],
+      licenses: ["MIT"],
+      links: %{
+        "Source" => "https://gitlab.com/jimsy/ssd1306"
+      }
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:elixir_ale, "~> 1.2"}
     ]
   end
 end

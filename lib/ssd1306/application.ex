@@ -1,4 +1,4 @@
-defmodule Ssd1306.Application do
+defmodule SSD1306.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -7,13 +7,22 @@ defmodule Ssd1306.Application do
 
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Ssd1306.Worker.start_link(arg)
-      # {Ssd1306.Worker, arg}
+      {Registry, keys: :unique, name: SSD1306.Registry}
     ]
+
+    devices =
+      :ssd1306
+      |> Application.get_env(:devices, [])
+      |> Enum.map(fn config ->
+        %{
+          id: {SSD1306.Device, Map.fetch!(config, :bus), Map.fetch!(config, :address)},
+          start: {SSD1306.Device, :start_link, [config]}
+        }
+      end)
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Ssd1306.Supervisor]
-    Supervisor.start_link(children, opts)
+    opts = [strategy: :one_for_one, name: SSD1306.Supervisor]
+    Supervisor.start_link(children ++ devices, opts)
   end
 end

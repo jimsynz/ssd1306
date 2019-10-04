@@ -1,8 +1,7 @@
-defmodule Ssd1306Test do
+defmodule SSD1306Test do
   use ExUnit.Case
   doctest Ssd1306
 
-  test "greets the world" do
-    assert Ssd1306.hello() == :world
-  end
+  # There are no tests written because there's no way to simulate the i2c
+  # interface (that I can think of right now).
 end
