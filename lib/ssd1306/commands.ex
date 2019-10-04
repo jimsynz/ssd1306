@@ -99,7 +99,7 @@ defmodule SSD1306.Commands do
   Send a frame to the display.
 
   Arguments:
-    * A map with `:i2c` set to the I2C connection pid, `:width` and `:height in pixels.
+    * A map with `:i2c` set to the I2C connection pid, `:width` and `:height` in pixels.
     * A bytestring containing the buffer to be displayed.
   """
   def display(%{i2c: pid, width: width, height: height}, buffer) do
