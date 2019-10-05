@@ -7,6 +7,11 @@ defmodule SSD1306.Commands do
   SSD1306 device.  More information about the available commands can be found in
   the _COMMAND TABLE_ section of the
   [Datasheet](https://cdn-shop.adafruit.com/datasheets/SSD1306.pdf).
+
+  For simple use cases you will most likely want to simply use the
+  `SSD1306.Device` module to automatically handle your display needs, however if
+  you have something more complicated in mind then you can use the functions in
+  this module to interact with an I2C device directly.
   """
 
   @control_register 0x00

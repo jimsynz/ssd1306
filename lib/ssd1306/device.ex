@@ -7,13 +7,31 @@ defmodule SSD1306.Device do
 
   @moduledoc """
   An individual SSD1306 device.
+
+  Each device needs it's configuration specified in your application's
+  configuration.
+
+  Example configuration:
+
+      config :ssd1306,
+        devices: [
+          %{bus: "i2c-1", address: 0x3D, name: :display0, width: 128, height: 32}
+        ]
+
+  Note that `bus` and `address` are required, `width` and `height` are optional
+  and default to `128` and `64` respectively.
+
+  `name` is also optional and allows you to specify an arbitrary name to
+  register this device as in `ssd1306`'s process registry.  You can then use
+  this name when using the public functions in this module to refer to a
+  specific device.  If not provided then a tuple of the bus name and address
+  will be used, for example the device above would be named `{"i2c-1", 0x3D}` if
+  the `name` value had not been set.
   """
 
   @default_config %{
     width: 128,
-    height: 64,
-    address: 0x3C,
-    bus: "i2c-1"
+    height: 64
   }
 
   # The name of a valid I2C bus. See ElixirALE documentation for more information.
@@ -22,6 +40,8 @@ defmodule SSD1306.Device do
   @type address :: non_neg_integer
   # A binary buffer of monochrome image data.
   @type buffer :: binary
+  # An arbitrary name for the device.
+  @type device_name :: {bus, address} | term
 
   @doc false
   def start_link(config), do: GenServer.start_link(Device, config)
@@ -29,33 +49,33 @@ defmodule SSD1306.Device do
   @doc """
   Turn on all pixels of the attached device.
   """
-  @spec all_on(bus, address) :: :ok | {:error, term}
-  def all_on(bus, address),
+  @spec all_on(device_name) :: :ok | {:error, term}
+  def all_on(device_name),
     do:
       GenServer.call(
-        {:via, Registry, {SSD1306.Registry, {SSD1306.Device, bus, address}}},
+        {:via, Registry, {SSD1306.Registry, device_name}},
         :all_on
       )
 
   @doc """
   Turn off all pixels of the attached device.
   """
-  @spec all_off(bus, address) :: :ok | {:error, term}
-  def all_off(bus, address),
+  @spec all_off(device_name) :: :ok | {:error, term}
+  def all_off(device_name),
     do:
       GenServer.call(
-        {:via, Registry, {SSD1306.Registry, {SSD1306.Device, bus, address}}},
+        {:via, Registry, {SSD1306.Registry, device_name}},
         :all_off
       )
 
   @doc """
   Send the contents of `buffer` to the device for display.
   """
-  @spec display(bus, address, buffer) :: :ok | {:error, term}
-  def display(bus, address, buffer) when is_binary(buffer),
+  @spec display(device_name, buffer) :: :ok | {:error, term}
+  def display(device_name, buffer) when is_binary(buffer),
     do:
       GenServer.call(
-        {:via, Registry, {SSD1306.Registry, {SSD1306.Device, bus, address}}},
+        {:via, Registry, {SSD1306.Registry, device_name}},
         {:display, buffer}
       )
 
@@ -79,14 +99,14 @@ defmodule SSD1306.Device do
   To invert the display.
 
       iex> alias SSD1306.{Device, Commands}
-      ...> Device.commands("i2c-1", 0x3D, fn pid -> Commands.invert_display!(pid) end)
+      ...> Device.commands({"i2c-1", 0x3D}, fn pid -> Commands.invert_display!(pid) end)
       :ok
   """
-  @spec execute(bus, address, function) :: :ok
-  def execute(bus, address, function) when is_function(function, 1),
+  @spec execute(device_name, function) :: :ok
+  def execute(device_name, function) when is_function(function, 1),
     do:
       GenServer.call(
-        {:via, Registry, {SSD1306.Registry, {SSD1306.Device, bus, address}}},
+        {:via, Registry, {SSD1306.Registry, device_name}},
         {:execute, function}
       )
 
@@ -94,20 +114,27 @@ defmodule SSD1306.Device do
   def init(config) do
     state = @default_config |> Map.merge(config)
 
-    Registry.register(SSD1306.Registry, {Device, state.bus, state.address}, self())
+    %{width: width, height: height, bus: bus, address: address} = state
+
+    name =
+      state
+      |> Map.get(:name, {bus, address})
+
+    {:ok, _} = Registry.register(SSD1306.Registry, name, self())
     Process.flag(:trap_exit, true)
 
-    Logger.info(
-      "Connecting to SSD1306 display #{device_name(state)} (#{state.width}x#{state.height} pixels)"
-    )
+    Logger.info("Connecting to SSD1306 display #{inspect(name)} (#{width}x#{height} pixels)")
 
-    {:ok, i2c} = I2C.start_link(state.bus, state.address)
-    {:ok, reset_pid} = GPIO.start_link(state.reset_pin, :output)
+    {:ok, i2c} = I2C.start_link(bus, address)
+    state = Map.put(state, :i2c, i2c)
 
     state =
-      state
-      |> Map.put(:i2c, i2c)
-      |> Map.put(:reset_pid, reset_pid)
+      if %{reset_pin: reset_pin} = state do
+        {:ok, reset_pid} = GPIO.start_link(reset_pin, :output)
+        Map.put(state, :reset_pid, reset_pid)
+      else
+        state
+      end
 
     case reset_device(state) do
       :ok -> {:ok, state}
@@ -150,13 +177,17 @@ defmodule SSD1306.Device do
   @impl true
   def terminate(_, _), do: :ok
 
-  defp device_name(%{bus: bus, address: address}) do
-    "#{bus}:0x#{Integer.to_string(address, 16)}"
-  end
-
   defp reset_device(%{reset_pid: reset_pid, i2c: i2c} = state) do
     with :ok <- Commands.reset!(reset_pid),
          :ok <- Commands.initialize!(state),
+         :ok <- Commands.display(state, all_off_buffer(state)),
+         :ok <- Commands.display_on!(i2c) do
+      :ok
+    end
+  end
+
+  defp reset_device(%{i2c: i2c} = state) do
+    with :ok <- Commands.initialize!(state),
          :ok <- Commands.display(state, all_off_buffer(state)),
          :ok <- Commands.display_on!(i2c) do
       :ok
