@@ -4,7 +4,7 @@ defmodule SSD1306.MixProject do
   def project do
     [
       app: :ssd1306,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
       description: "Provides a driver for SSD1306-based monochrome displays connected via I2C",
