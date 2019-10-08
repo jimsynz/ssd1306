@@ -116,9 +116,7 @@ defmodule SSD1306.Device do
 
     %{width: width, height: height, bus: bus, address: address} = state
 
-    name =
-      state
-      |> Map.get(:name, {bus, address})
+    name = device_name(state)
 
     {:ok, _} = Registry.register(SSD1306.Registry, name, self())
     Process.flag(:trap_exit, true)
@@ -218,4 +216,15 @@ defmodule SSD1306.Device do
        "Expected buffer of #{div(width * height, 8)} bytes but received buffer of #{
          byte_size(buffer)
        } bytes."}
+
+  defp device_name(%{bus: bus, address: address} = state),
+    do: Map.get(state, :name, {bus, address})
+
+  def child_spec(config) do
+    %{
+      id: {SSD1306.Device, device_name(config)},
+      start: {SSD1306.Device, :start_link, [config]},
+      restart: :transient
+    }
+  end
 end

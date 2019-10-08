@@ -18,15 +18,15 @@ defmodule SSD1306 do
   Connect to an SSD1306 device.
   """
   def connect(config),
-    do:
-      Supervisor.start_child(SSD1306.Supervisor, %{
-        id: {SSD1306.Device, Map.fetch!(config, :bus), Map.fetch!(config, :address)},
-        start: {SSD1306.Device, :start_link, [config]}
-      })
+    do: Supervisor.start_child(SSD1306.Supervisor, {SSD1306.Device, config})
 
   @doc """
-        Disconnect an SSD1306 device.
+  Disconnect an SSD1306 device.
   """
-  def disconnect(device_name),
-    do: Process.exit({:via, Registry, {SSD1306.Registry, device_name}}, :normal)
+  def disconnect(device_name) do
+    with :ok <- Supervisor.terminate_child(SSD1306.Supervisor, {SSD1306.Device, device_name}),
+         :ok <- Supervisor.delete_child(SSD1306.Supervisor, {SSD1306.Device, device_name}) do
+      :ok
+    end
+  end
 end

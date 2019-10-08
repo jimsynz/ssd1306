@@ -13,12 +13,7 @@ defmodule SSD1306.Application do
     devices =
       :ssd1306
       |> Application.get_env(:devices, [])
-      |> Enum.map(fn config ->
-        %{
-          id: {SSD1306.Device, Map.fetch!(config, :bus), Map.fetch!(config, :address)},
-          start: {SSD1306.Device, :start_link, [config]}
-        }
-      end)
+      |> Enum.map(&{SSD1306.Device, &1})
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
