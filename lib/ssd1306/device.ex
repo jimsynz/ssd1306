@@ -1,7 +1,7 @@
 defmodule SSD1306.Device do
   use GenServer
   use Bitwise
-  alias ElixirALE.{I2C, GPIO}
+  alias ElixirALE.{GPIO, I2C}
   alias SSD1306.{Commands, Device}
   require Logger
 
@@ -127,11 +127,13 @@ defmodule SSD1306.Device do
     state = Map.put(state, :i2c, i2c)
 
     state =
-      if %{reset_pin: reset_pin} = state do
-        {:ok, reset_pid} = GPIO.start_link(reset_pin, :output)
-        Map.put(state, :reset_pid, reset_pid)
-      else
-        state
+      case state do
+        %{reset_pin: reset_pin} ->
+          {:ok, reset_pid} = GPIO.start_link(reset_pin, :output)
+          Map.put(state, :reset_pid, reset_pid)
+
+        _ ->
+          state
       end
 
     case reset_device(state) do

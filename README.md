@@ -39,12 +39,12 @@ How you generate buffers is up to you, but I suggest
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `SSD1306` to your list of dependencies in `mix.exs`:
+by adding `ssd1306` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:SSD1306, "~> 0.1.0"}
+    {:ssd1306, "~> 0.1.1"}
   ]
 end
 ```

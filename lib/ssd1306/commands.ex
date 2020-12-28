@@ -1,6 +1,6 @@
 defmodule SSD1306.Commands do
   use Bitwise
-  alias ElixirALE.{I2C, GPIO}
+  alias ElixirALE.{GPIO, I2C}
 
   @moduledoc """
   This module contains all the constants and commands for manipulating the
