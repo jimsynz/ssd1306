@@ -56,8 +56,7 @@ defmodule SSD1306.Commands do
          :ok <- :timer.sleep(1),
          :ok <- GPIO.write(gpio_pid, 0),
          :ok <- :timer.sleep(10),
-         :ok <- GPIO.write(gpio_pid, 1),
-         do: :ok
+         do: GPIO.write(gpio_pid, 1)
   end
 
   @doc """
@@ -96,8 +95,7 @@ defmodule SSD1306.Commands do
          :ok <- pre_charge(pid, Map.get(state, :pre_charge, vcc_is_external(state, 0x22, 0xF1))),
          :ok <- vcom_detect(pid, Map.get(state, :vcom_detect, 0x40)),
          :ok <- display_all_on_resume!(pid),
-         :ok <- normal_display!(pid),
-         do: :ok
+         do: normal_display!(pid)
   end
 
   @doc """
@@ -112,8 +110,7 @@ defmodule SSD1306.Commands do
 
     with :ok <- column_address(pid, 0, width - 1),
          :ok <- page_address(pid, 0, pages - 1),
-         :ok <- send_buffer(pid, buffer),
-         do: :ok
+         do: send_buffer(pid, buffer)
   end
 
   def contrast(pid, value) when is_integer(value),
@@ -173,9 +170,10 @@ defmodule SSD1306.Commands do
   defp send_buffer(pid, buffer) when byte_size(buffer) < 512, do: send_data(pid, buffer)
 
   defp send_buffer(pid, <<data::binary-size(511), rest::binary>>) do
-    with :ok <- send_data(pid, data),
-         :ok <- send_buffer(pid, rest),
-         do: :ok
+    case send_data(pid, data) do
+      :ok -> send_buffer(pid, rest)
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   defp vcc_is_external(%{external_vcc: true}, value, _), do: value

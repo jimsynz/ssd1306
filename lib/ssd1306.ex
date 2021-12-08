@@ -24,9 +24,9 @@ defmodule SSD1306 do
   Disconnect an SSD1306 device.
   """
   def disconnect(device_name) do
-    with :ok <- Supervisor.terminate_child(SSD1306.Supervisor, {SSD1306.Device, device_name}),
-         :ok <- Supervisor.delete_child(SSD1306.Supervisor, {SSD1306.Device, device_name}) do
-      :ok
+    case Supervisor.terminate_child(SSD1306.Supervisor, {SSD1306.Device, device_name}) do
+      :ok -> Supervisor.delete_child(SSD1306.Supervisor, {SSD1306.Device, device_name})
+      {:error, reason} -> {:error, reason}
     end
   end
 end

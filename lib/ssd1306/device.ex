@@ -181,17 +181,13 @@ defmodule SSD1306.Device do
     with :ok <- Commands.reset!(reset_pid),
          :ok <- Commands.initialize!(state),
          :ok <- Commands.display(state, all_off_buffer(state)),
-         :ok <- Commands.display_on!(i2c) do
-      :ok
-    end
+         do: Commands.display_on!(i2c)
   end
 
   defp reset_device(%{i2c: i2c} = state) do
     with :ok <- Commands.initialize!(state),
          :ok <- Commands.display(state, all_off_buffer(state)),
-         :ok <- Commands.display_on!(i2c) do
-      :ok
-    end
+         do: Commands.display_on!(i2c)
   end
 
   defp all_on_buffer(state), do: initialize_buffer(state, 1)
@@ -215,9 +211,7 @@ defmodule SSD1306.Device do
   defp validate_buffer(buffer, %{width: width, height: height}),
     do:
       {:error,
-       "Expected buffer of #{div(width * height, 8)} bytes but received buffer of #{
-         byte_size(buffer)
-       } bytes."}
+       "Expected buffer of #{div(width * height, 8)} bytes but received buffer of #{byte_size(buffer)} bytes."}
 
   defp device_name(%{bus: bus, address: address} = state),
     do: Map.get(state, :name, {bus, address})
