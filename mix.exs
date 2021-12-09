@@ -40,7 +40,7 @@ defmodule SSD1306.MixProject do
       {:ex_doc, ">= 0.0.0", only: ~w[dev test]a, runtime: false},
       {:elixir_ale, "~> 1.2", optional: true},
       {:credo, "~> 1.6", only: ~w[dev test]a, runtime: false},
-      {:git_ops, "~> 2.3", only: ~w[dev test]a, runtime: false}
+      {:git_ops, "~> 2.4", only: ~w[dev test]a, runtime: false}
     ]
   end
 end
