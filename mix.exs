@@ -36,8 +36,8 @@ defmodule SSD1306.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:earmark, ">= 1.4.20", only: ~w[dev test]a, runtime: false},
-      {:ex_doc, ">= 0.26.0", only: ~w[dev test]a, runtime: false},
+      {:earmark, "~> 1.4", only: ~w[dev test]a, runtime: false},
+      {:ex_doc, "~> 0.28", only: ~w[dev test]a, runtime: false},
       {:elixir_ale, "~> 1.2", optional: true},
       {:credo, "~> 1.6", only: ~w[dev test]a, runtime: false},
       {:git_ops, "~> 2.4", only: ~w[dev test]a, runtime: false}
