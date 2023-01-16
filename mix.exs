@@ -1,7 +1,7 @@
 defmodule SSD1306.MixProject do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "1.0.0"
 
   def project do
     [
