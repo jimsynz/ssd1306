@@ -28,7 +28,7 @@ defmodule SSD1306.MixProject do
       maintainers: ["James Harton <james@harton.nz>"],
       licenses: ["HL3-FULL"],
       links: %{
-        "Source" => "https://gitlab.com/jimsy/ssd1306"
+        "Source" => "https://harton.dev/james/ssd1306"
       }
     ]
   end
@@ -36,7 +36,10 @@ defmodule SSD1306.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:dialyxir, "~> 1.4", only: ~w[dev test]a, runtime: false},
+      {:doctor, "~> 0.21", only: ~w[dev test]a, runtime: false},
       {:earmark, "~> 1.4", only: ~w[dev test]a, runtime: false},
+      {:ex_check, "~> 0.16", only: ~w[dev test]a, runtime: false},
       {:ex_doc, "~> 0.30", only: ~w[dev test]a, runtime: false},
       {:elixir_ale, "~> 1.2", optional: true},
       {:credo, "~> 1.6", only: ~w[dev test]a, runtime: false},

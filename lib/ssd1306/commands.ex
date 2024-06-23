@@ -1,5 +1,5 @@
 defmodule SSD1306.Commands do
-  use Bitwise
+  import Bitwise
   alias ElixirALE.{GPIO, I2C}
 
   @moduledoc """
@@ -37,7 +37,7 @@ defmodule SSD1306.Commands do
   @cmd_set_column_address 0x21
   @cmd_set_page_address 0x22
   @cmd_com_scan_inc 0xC0
-  @cmd_com_scan_dec 0xC8
+  # @cmd_com_scan_dec 0xC8
   @cmd_set_seg_remap 0xA0
   @cmd_set_charge_pump 0x8D
   @cmd_activate_scroll 0x2F
@@ -113,51 +113,103 @@ defmodule SSD1306.Commands do
          do: send_buffer(pid, buffer)
   end
 
+  @doc "set contrast"
   def contrast(pid, value) when is_integer(value),
     do: send_commands(pid, [@cmd_set_contrast, value])
 
+  @doc "set display all on resume"
   def display_all_on_resume!(pid), do: send_command(pid, @cmd_display_all_on_resume)
+
+  @doc "set display all on"
   def display_all_on!(pid), do: send_command(pid, @cmd_display_all_on)
+
+  @doc "set normal display"
   def normal_display!(pid), do: send_command(pid, @cmd_normal_display)
+
+  @doc "set invert display"
   def invert_display!(pid), do: send_command(pid, @cmd_invert_display)
+
+  @doc "set display off"
   def display_off!(pid), do: send_command(pid, @cmd_display_off)
+
+  @doc "set display on"
   def display_on!(pid), do: send_command(pid, @cmd_display_on)
+
+  @doc "set display offset"
   def display_offset(pid, value), do: send_commands(pid, [@cmd_set_display_offset, value])
+
+  @doc "set com pins"
   def com_pins(pid, value), do: send_commands(pid, [@cmd_set_com_pins, value])
+
+  @doc "set vcom detect"
   def vcom_detect(pid, value), do: send_commands(pid, [@cmd_set_vcom_detect, value])
+
+  @doc "display clock div"
   def display_clock_div(pid, value), do: send_commands(pid, [@cmd_set_display_clock_div, value])
+
+  @doc "set pre charge"
   def pre_charge(pid, value), do: send_commands(pid, [@cmd_set_pre_charge, value])
+
+  @doc "set multiplex"
   def multiplex(pid, value), do: send_commands(pid, [@cmd_set_multiplex, value])
 
+  @doc "set low column"
   def low_column(pid, value), do: send_commands(pid, [@cmd_set_low_column, value])
+
+  @doc "set high column"
   def high_column(pid, value), do: send_commands(pid, [@cmd_set_high_column, value])
+
+  @doc "set start line"
   def start_line(pid, value), do: send_command(pid, @cmd_set_start_line ||| value)
+
+  @doc "set memory node"
   def memory_mode(pid, value), do: send_commands(pid, [@cmd_set_memory_mode, value])
 
+  @doc "set column address"
   def column_address(pid, start, fin),
     do: send_commands(pid, [@cmd_set_column_address, start, fin])
 
+  @doc "set page address"
   def page_address(pid, start, fin), do: send_commands(pid, [@cmd_set_page_address, start, fin])
+
+  @doc "set com scan inc"
   def com_scan_inc!(pid), do: send_command(pid, @cmd_com_scan_inc)
+
+  @doc "set com scan dec"
   def com_scan_dec!(pid), do: send_command(pid, @cmd_com_scan_inc)
+
+  @doc "set segment remap"
   def segment_remap(pid, value), do: send_command(pid, @cmd_set_seg_remap ||| value)
+
+  @doc "set charge pump"
   def charge_pump(pid, value), do: send_commands(pid, [@cmd_set_charge_pump, value])
+
+  @doc "set activate scroll"
   def activate_scroll!(pid), do: send_command(pid, @cmd_activate_scroll)
+
+  @doc "set deactivate scroll"
   def deactivate_scroll!(pid), do: send_command(pid, @cmd_deactivate_scroll)
 
+  @doc "set vertical scroll area"
   def vertical_scroll_area(pid, value),
     do: send_commands(pid, [@cmd_set_vertical_scroll_area, value])
 
+  @doc "set right horizontal scroll"
   def right_horizontal_scroll!(pid), do: send_command(pid, @cmd_right_horizontal_scroll)
+
+  @doc "set left horizontal scroll"
   def left_horizontal_scroll!(pid), do: send_command(pid, @cmd_left_horizontal_scroll)
 
+  @doc "set vertical and right horizontal scroll"
   def vertical_and_right_horizontal_scroll!(pid),
     do: send_command(pid, @cmd_vertical_and_right_horizontal_scroll)
 
+  @doc "set vertical and left horizontal scroll"
   def vertical_and_left_horizontal_scroll!(pid),
     do: send_command(pid, @cmd_vertical_and_left_horizontal_scroll)
 
   defp send_data(pid, buffer), do: I2C.write(pid, <<@data_register>> <> buffer)
+
   defp send_command(pid, byte), do: I2C.write(pid, <<@control_register, byte>>)
 
   defp send_commands(pid, commands) do

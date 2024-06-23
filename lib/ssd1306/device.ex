@@ -1,6 +1,6 @@
 defmodule SSD1306.Device do
   use GenServer
-  use Bitwise
+  import Bitwise
   alias ElixirALE.{GPIO, I2C}
   alias SSD1306.{Commands, Device}
   require Logger

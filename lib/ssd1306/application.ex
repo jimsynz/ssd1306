@@ -5,6 +5,7 @@ defmodule SSD1306.Application do
 
   use Application
 
+  @doc false
   def start(_type, _args) do
     children = [
       {Registry, keys: :unique, name: SSD1306.Registry}
