@@ -48,7 +48,7 @@ by adding `ssd1306` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ssd1306, "~> 1.0.0"}
+    {:ssd1306, "~> 1.0.1"}
   ]
 end
 ```

@@ -5,6 +5,11 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.0.1](https://harton.dev/james/ssd1306/compare/v1.0.0...v1.0.1) (2024-06-24)
+
+
+
+
 ## [v1.0.0](https://harton.dev/james/ssd1306/compare/v0.1.1...v1.0.0) (2023-01-16)
 
 ### Breaking Changes:
