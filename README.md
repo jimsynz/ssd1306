@@ -1,6 +1,5 @@
 # SSD1306
 
-[![Build Status](https://drone.harton.dev/api/badges/james/ssd1306/status.svg)](https://drone.harton.dev/james/ssd1306)
 [![Hex.pm](https://img.shields.io/hexpm/v/ssd1306.svg)](https://hex.pm/packages/ssd1306)
 [![Hippocratic License HL3-FULL](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-FULL&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/full.html)
 
